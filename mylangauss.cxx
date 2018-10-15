@@ -56,12 +56,15 @@ int main(int argc, char **argv){
     cout << "Error! no such histogram, please check ur root file!" << endl;
     return(1);
   }
-  //double x_min = data_histogram->FindFirstBinAbove(0);
-  //double x_max = data_histogram->FindLastBinAbove(0);
+  
+  double x_min = data_histogram->FindFirstBinAbove(0);
+  double x_max = data_histogram->FindLastBinAbove(0);
   double hist_mean = data_histogram->GetMean();
   double hist_devi = data_histogram->GetStdDev();
-    
-    //cout << x_min << " " << x_max << " " << hist_mean << " " << hist_devi << endl;
+
+  
+  cout << x_min << " " << x_max << " " << hist_mean << " " << hist_devi << endl;
+  
     RooRealVar x("ADC", "ADC", hist_mean - 5*hist_devi, hist_mean + 5*hist_devi); // mean+-5sigma
     //Construct Landau
     
