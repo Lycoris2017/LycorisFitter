@@ -16,15 +16,15 @@
 #include <TKey.h>
 #include <TMacro.h>
 
-#include <RooRealVar.h>
-#include <RooDataSet.h>
-#include <RooDataHist.h>
-#include <RooGaussian.h>
-#include <RooLandau.h>
-#include <RooAddPdf.h>
-#include <RooFFTConvPdf.h>
-#include <RooPlot.h>
-
+#include "RooRealVar.h"
+#include "RooDataSet.h"
+#include "RooDataHist.h"
+#include "RooGaussian.h"
+#include "RooLandau.h"
+#include "RooAddPdf.h"
+#include "RooFFTConvPdf.h"
+#include "RooPlot.h"
+#include "RooFitResult.h"
 
 using namespace RooFit; 
 using namespace std;
@@ -45,7 +45,8 @@ int main(int argc, char **argv){
   //string histogram_name = "hist_s631_c0446_b0_k26"; //Tracker
   //string histogram_name = "hist_s890_c0064_b0_k30"; //ECAL
 
-  TString name = "hist_s631_c0446_k26";
+  //TString name = "hist_s631_c0446_k26";
+  TString name = "hist_fc_s631_c0446_b0_k26";
   const char* histname = name.Data();
   
   TH1F* data_histogram = nullptr;
@@ -80,28 +81,35 @@ int main(int argc, char **argv){
     
     RooPlot* frame = x.frame(Title(histname));
     RooFFTConvPdf* langauss = new RooFFTConvPdf(histname, "landau (X) gauss", x, *landau, *gauss);
-    
+
+    //-- Import Data:
     RooDataHist* datahist = new RooDataHist("datahist","datahist",x,Import(*data_histogram)) ;
     
-    //datahist.statOn(frame,Layout(0.55,0.99,0.9)) ;
-		
+	
     ////RANGE
-    datahist->plotOn(frame);
     //x.setRange("R1", hist_mean-hist_devi/4,hist_mean+hist_devi);
-    langauss->fitTo(*datahist, SumW2Error(kTRUE));
+
+    //-- Fit pdf to Data:
+    RooFitResult * fitres = langauss->fitTo(*datahist, SumW2Error(kTRUE),RooFit::Save());
     //langauss->chi2FitTo(datahist, Range("R1")) ;
-    //langauss->paramOn(frame, Layout(0.7,0.99,0.9)) ;
     
-    //langauss.plotOn(frame, Range("R1"), LineColor(kBlack));
-    langauss->plotOn(frame, Range("Full"), LineColor(kBlack));
+    cout<< "[Mengqing] Print RooFitResult >>";
+    fitres->Print();
+    cout<< "[Mengqing] Finished printing <<\n" <<endl;
+    
+    //-- Ploting:
+    datahist->plotOn(frame);
+    datahist->statOn(frame,Layout(0.55,0.99,0.9)) ;
+    langauss->paramOn(frame, Layout(0.7,0.99,0.9)) ;
+    //langauss->plotOn(frame, Range("R1"), LineColor(kRed));
+    langauss->plotOn(frame, Range("Full"), LineColor(kRed));
     //landau->fitTo(datahist) ;
-    //landau->plotOn(frame, Range("Full"), LineStyle(kDashed),LineColor(kRed)) ;
+    //landau->plotOn(frame, Range("Full"), LineStyle(kDashed),LineColor(kBlue)) ;
     
     TCanvas* c = new TCanvas(histname,histname,1600,1200) ;
     frame->Draw() ;
     
-    //c->SaveAs("./langauss_fit_to_beam_channel_tracker_test.png");
-    //c->SaveAs("./langauss_fit_to_beam_channel_ECAL.png");
+   
     //datahist.Write();
     c->Write();
     //out_file->Write();
