@@ -29,8 +29,6 @@
 using namespace RooFit; 
 using namespace std;
 
-//vector<TObject*> hist_objects;
-//TObject* test_object;
 
 int main(int argc, char **argv){
   if (argc < 2) {
@@ -111,6 +109,7 @@ int main(int argc, char **argv){
     
    
     //datahist.Write();
+    fitres->Write();
     c->Write();
     //out_file->Write();
     cout << "Mean of the Histogram: " << hist_mean << endl;
