@@ -44,7 +44,8 @@ int main(int argc, char **argv){
   //string histogram_name = "hist_s890_c0064_b0_k30"; //ECAL
 
   //TString name = "hist_s631_c0446_k26";
-  TString name = "hist_fc_s631_c0446_b0_k26";
+  //TString name = "hist_fc_s631_c0446_b0_k26";
+  TString name = "hist_timed_s490_c0395_b0_k26"; 
   const char* histname = name.Data();
   
   TH1F* data_histogram = nullptr;
