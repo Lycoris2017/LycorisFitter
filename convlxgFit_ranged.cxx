@@ -88,7 +88,8 @@ int main(int argc, char **argv){
   TString name;
   // name = "hist_fc_s631_c0446_b0_k26";
   // name = "hist_timed_s490_c0395_b0_k26";
-  name = "cluster_charge_all_sens0_b0";
+  //  name = "cluster_charge_all_sens0_b0";
+  name = "cluster_charge_cuts_sens0_b0";
 
   //** END -- SET YOUR Parameters.
   
@@ -113,6 +114,7 @@ int main(int argc, char **argv){
   TFile *out_file = new TFile("output_ranged.root", "RECREATE");
 
   //data_histogram->Scale(103210);
+  data_histogram->Scale(1514);
   //ScaleXaxis(data_histogram, ScaleX);
   
   data_histogram->Write();
@@ -145,7 +147,7 @@ void fitLan(TH1F* dh, TFile& fout, double xmin, double xmax){
     
   // Create observables
   //RooRealVar x("poi","ADC",40,60) ;
-  RooRealVar x("poi","fC",xmin, xmax) ;
+  RooRealVar x("poi","Charge [fC]",xmin, xmax) ;
  
   // Create Landau
   RooRealVar sigma("sigma","sigma", 5, 0.1, 10) ;
@@ -158,7 +160,7 @@ void fitLan(TH1F* dh, TFile& fout, double xmin, double xmax){
   // Fit pdf to data
   landau->fitTo(*datahist,  SumW2Error(kTRUE)) ;
 
-
+	  
   //-- Ploting:
   RooPlot* frame = x.frame(Title(outhist), Bins( datahist->numEntries() ));
   frame->SetName("frame_fitTo_lanOnly");
@@ -170,16 +172,19 @@ void fitLan(TH1F* dh, TFile& fout, double xmin, double xmax){
   frame->GetXaxis()->SetTitleFont(42);
   frame->GetYaxis()->SetTitleFont(42);
   
-  datahist->plotOn(frame, LineColor(kBlue), MarkerColor(kBlue));
+  datahist->plotOn(frame, Name("datahist"), LineColor(kBlue), MarkerColor(kBlue));
 
-  landau->plotOn( frame, LineStyle(kDashed),LineColor(kRed) );
+  landau->plotOn( frame, Name("landau"),LineStyle(kDashed),LineColor(kRed) );
 
   //langauss->plotOn(frame, Range("Full"), LineColor(kRed));
   //landau->plotOn(frame, Range("Full"), LineStyle(kDashed),LineColor(kBlue)) ;
 
-  datahist->statOn(frame,Layout(0.6,0.85,0.9)) ;
-  landau->paramOn(frame, Layout(0.65,0.95,0.7)) ;
-  
+  //datahist->statOn(frame,Layout(0.6,0.85,0.9)) ;
+  //landau->paramOn(frame, Layout(0.65,0.95,0.7)) ;
+  landau->paramOn(frame,  Layout(0.5,0.8,0.9), Format("NEU", AutoPrecision(1)) ) ;
+
+  frame->GetYaxis()->SetTitle("Clusters");
+	  
   TCanvas* c = new TCanvas(outhist,outhist,800,600) ;
   frame->Draw() ;
   fout.cd();
