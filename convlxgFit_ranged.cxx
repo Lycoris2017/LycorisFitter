@@ -72,53 +72,62 @@ void ScaleXaxis(TH1 *h, Double_t (*Scale)(Double_t))
 
 int main(int argc, char **argv){
   if (argc < 2) {
-    cout << "Please add a root file as argument" << endl;
+    cout << "Please add a root file as argument.\n Usage: ./temp xx.root [0.1 10]" << endl;
     return(1);
   }	
 
   //** START-- SET YOUR Parameters.
-
-  double xmin=0.1;//160;
-  double xmax=10;//240;
-  
   //gStyle->SetOptFit(1111);
-  //string histogram_name = "hist_sl631_c0446_b0_k26"; //Tracker
-  //string histogram_name = "hist_s890_c0064_b0_k30"; //ECAL
+  double xmin=0.1;
+  double xmax=10;
+  if (argc == 4){
+    double a = atof(argv[2]);
+    double b = atof(argv[3]);
+    if (a<b){
+      xmin = a;
+      xmax = b;
+    }
+  }
+  cout << "Fit range : "<< xmin << " to " << xmax << endl;
 
   TString name;
-  // name = "hist_fc_s631_c0446_b0_k26";
-  // name = "hist_timed_s490_c0395_b0_k26";
-  //  name = "cluster_charge_all_sens0_b0";
-  name = "cluster_charge_cuts_sens0_b0";
-
+  // name = "hist_sl631_c0446_b0_k26"; //Tracker
+  // name = "hist_s890_c0064_b0_k30"; //ECAL
+  // name = "hist_fc_s631_c0446_b0_k26"; //-> Test code with testIn.root
+  name = "Charge_w_pos_cut";
   //** END -- SET YOUR Parameters.
   
   const char* histname = name.Data();
-  
-  TH1F* data_histogram = nullptr;
-  TFile *data_file = TFile::Open(argv[1], "read");
-  
-  data_file->GetObject( histname, data_histogram );
-  data_histogram->SetDirectory(0);
 
-  data_file->Close();
-  
+  TFile *data_file = TFile::Open(argv[1], "read");
+  TH1F* data_histogram = nullptr;
+  data_file->GetObject( histname, data_histogram );
   if ( data_histogram==nullptr ) {
     cout << "Error! no such histogram, please check ur root file!" << endl;
     return(1);
   }
 
-  
+  data_histogram->SetDirectory(0);
+  data_file->Close();
   //SetRangeCutX(*data_histogram, 0.9);
 
-  TFile *out_file = new TFile("output_ranged.root", "RECREATE");
+  string x; 
+  cout << "Normalize data hist to 1? [y/n]"; // Type a number and press enter
+  cin >> x; // Get user input from the keyboard
+  if (x=="y" || x=="Y"  ){
+    cout << "Normalize to 1..." << endl;
+    data_histogram->Scale(1/data_histogram->Integral());
+  }
+  else
+    cout << "No Normalize." << endl;
 
+  /**** different scale function used to tune your fit ****/
   //data_histogram->Scale(103210);
-  data_histogram->Scale(1514);
   //ScaleXaxis(data_histogram, ScaleX);
-  
+
+  TFile *out_file = new TFile("output_ranged.root", "RECREATE");
   data_histogram->Write();
-  
+    
   fitLan(data_histogram, *out_file, xmin, xmax);
   fitLxG(data_histogram, *out_file, xmin, xmax);
 
