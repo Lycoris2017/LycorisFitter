@@ -71,18 +71,21 @@ void ScaleXaxis(TH1 *h, Double_t (*Scale)(Double_t))
 
 
 int main(int argc, char **argv){
-  if (argc < 2) {
-    cout << "Please add a root file as argument.\n Usage: ./temp xx.root [0.1 10]" << endl;
+  if (argc < 3) {
+    cout << "Please add a root file as argument.\n Usage: ./temp xx.root histname [0.1 10]" << endl;
     return(1);
   }	
 
   //** START-- SET YOUR Parameters.
   //gStyle->SetOptFit(1111);
+  TString name;
+  name = argv[2];
+  
   double xmin=0.1;
   double xmax=10;
-  if (argc == 4){
-    double a = atof(argv[2]);
-    double b = atof(argv[3]);
+  if (argc == 5){
+    double a = atof(argv[3]);
+    double b = atof(argv[4]);
     if (a<b){
       xmin = a;
       xmax = b;
@@ -90,11 +93,6 @@ int main(int argc, char **argv){
   }
   cout << "Fit range : "<< xmin << " to " << xmax << endl;
 
-  TString name;
-  // name = "hist_sl631_c0446_b0_k26"; //Tracker
-  // name = "hist_s890_c0064_b0_k30"; //ECAL
-  // name = "hist_fc_s631_c0446_b0_k26"; //-> Test code with testIn.root
-  name = "Charge_w_pos_cut";
   //** END -- SET YOUR Parameters.
   
   const char* histname = name.Data();
@@ -128,7 +126,7 @@ int main(int argc, char **argv){
   TFile *out_file = new TFile("output_ranged.root", "RECREATE");
   data_histogram->Write();
     
-  fitLan(data_histogram, *out_file, xmin, xmax);
+  //fitLan(data_histogram, *out_file, xmin, xmax);
   fitLxG(data_histogram, *out_file, xmin, xmax);
 
   out_file->Close();
@@ -222,24 +220,13 @@ void fitLxG(TH1F* dh, TFile& fout, double xmin, double xmax){
 	
   TH1F *m_dh = (TH1F*) dh->Clone();
   m_dh->SetDirectory(0);
-
   //m_dh->Rebin(4);
-  
-  
   const char* histname = m_dh ->GetName();
-    
-  double x_min = m_dh->FindFirstBinAbove(0);
-  double x_max = m_dh->FindLastBinAbove(0);
-  double hmean = m_dh->GetMean();
-  double hsig  = m_dh->GetStdDev();
-  
-  cout << x_min << " " << x_max << " " << hmean << " " << hsig << endl;
 
 
-  /*--  Start L x G fit --*/
+  /*--  Start LxG fit --*/
 
   //-- Construct observable
-  //RooRealVar x ("poi", "ADC", hmean - 2*hsig, hmean + 3*hsig); // mean+-5sigma
   RooRealVar x ("poi", "fC", xmin, xmax); // mean+-5sigma
   
   //-- Import Data
@@ -252,9 +239,6 @@ void fitLxG(TH1F* dh, TFile& fout, double xmin, double xmax){
   /*-- Create Model --*/
 
   //-- Construct Landau
-  // RooRealVar lmean ("lmean","mean of landau", hmean, hmean - 2*hsig, hmean + 2*hsig) ; // mean+-sigma
-  // RooRealVar lsigma ("lsigma","width of landau", hsig/2, 0, hsig) ; // between 0 and sigma with starting parameter sigma/2
-
   RooRealVar lmean ("lmean","mean of landau", xmean, xmin, xmax) ;
   RooRealVar lsigma ("lsigma","width of landau", 5, 0.1, 10) ; 
   RooLandau* landau = new RooLandau("landau","landau PDF", x, lmean, lsigma) ; 
@@ -266,25 +250,30 @@ void fitLxG(TH1F* dh, TFile& fout, double xmin, double xmax){
     
   //-- Construct gauss
   RooRealVar gmean("gmean","mean of gauss", 0) ;
-  //RooRealVar gsigma("gsigma","width of gauss", hsig/4, 0, hsig/2) ; // between 0 and sigma/2 with starting parameter sigma/4
   RooRealVar gsigma("gsigma","width of gauss", 0.3, 0.1, 1.5) ;
   RooGaussian* gauss = new RooGaussian("gauss","gauss PDF", x, gmean, gsigma) ;
   
   //-- Construct convolution pdf
   cout << "[MQ] How many bins of observable-x => " << x.getBins("cache") << endl;
- 
   x.setBins( datahist->numEntries(), "cache");
   cout << "[MQ] Change bins of observable-x => " << x.getBins("cache") << endl;
 
   RooFFTConvPdf* langauss = new RooFFTConvPdf(histname, "landau (X) gauss", x, *landau, *gauss);
   
-  ////RANGE
-  //x.setRange("R1", hmean-hsig/4,hmean+hsig);
-  
   //-- Fit pdf to Data:
   RooFitResult * fitres = langauss->fitTo(*datahist, SumW2Error(kTRUE),RooFit::Save());
-  //    langauss->chi2FitTo(datahist, Range("R1")) ;
-  landauOnly->fitTo(*datahist,  SumW2Error(kTRUE)) ;
+
+  
+  string input; 
+  cout << "Do a landau-only fit? [y/n]"; // Type a number and press enter
+  cin >> input; // Get user input from the keyboard
+  bool dolanfit = (input=="y");
+  if (dolanfit){
+	  printf("[INFO] Do also landauOnly.\n");
+	  landauOnly->fitTo(*datahist,  SumW2Error(kTRUE)) ;
+  }
+  else
+	  printf("[INFO] No fit to landauOnly.\n");
 
   cout<< "[Mengqing] Print RooFitResult >>";
   fitres->Print();
@@ -305,7 +294,8 @@ void fitLxG(TH1F* dh, TFile& fout, double xmin, double xmax){
 
   langauss ->plotOn( frame, LineColor(kRed) );
   //landau ->plotOn( frame, LineStyle(kDashed),LineColor(kBlue) );
-  landauOnly ->plotOn( frame, LineStyle(kDashed), LineColor(kBlue) );
+  if (dolanfit)
+	  landauOnly ->plotOn( frame, LineStyle(kDashed), LineColor(kBlue) );
   
   //langauss->plotOn(frame, Range("Full"), LineColor(kRed));
   //landau->plotOn(frame, Range("Full"), LineStyle(kDashed),LineColor(kBlue)) ;
