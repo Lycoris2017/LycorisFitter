@@ -301,10 +301,13 @@ void fitLxG(TH1F* dh, TFile& fout, double xmin, double xmax){
   //landau->plotOn(frame, Range("Full"), LineStyle(kDashed),LineColor(kBlue)) ;
 
   //datahist->statOn(frame,Layout(0.55,0.85,0.9)) ;
-  langauss->paramOn(frame, Layout(0.5,0.8,0.9), Format("NEU", AutoPrecision(1)) ) ;
-  //langauss->plotOn(frame, Range("R1"), LineColor(kRed));
-
-  
+  langauss->paramOn(frame, Layout(0.5,0.7,0.85), Format("NEU", AutoPrecision(1)) ) ;
+  TString parambox = histname;
+  parambox += "_paramBox";
+  frame->getAttText(parambox)->SetTextColor(kBlack);
+  frame->getAttFill(parambox)->SetFillStyle(0);
+  frame->getAttLine(parambox)->SetLineWidth(0);
+	  
   TCanvas* c = new TCanvas(histname,histname,800,600) ;
   frame->Draw() ;
 
