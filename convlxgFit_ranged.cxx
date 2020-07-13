@@ -239,9 +239,9 @@ void fitLxG(TH1F* dh, TFile& fout, double xmin, double xmax){
   /*-- Create Model --*/
 
   //-- Construct Landau
-  RooRealVar lmean ("lmean","mean of landau", xmean, xmin, xmax) ;
+  RooRealVar lmpv ("lmpv","mpv of landau", xmean, xmin, xmax) ;
   RooRealVar lsigma ("lsigma","width of landau", 5, 0.1, 10) ; 
-  RooLandau* landau = new RooLandau("landau","landau PDF", x, lmean, lsigma) ; 
+  RooLandau* landau = new RooLandau("landau","landau PDF", x, lmpv, lsigma) ; 
 
   //-- Construct Landau Only fit
   RooRealVar mean ("mean","mean of landau", xmean, xmin, xmax );
@@ -301,7 +301,7 @@ void fitLxG(TH1F* dh, TFile& fout, double xmin, double xmax){
   //landau->plotOn(frame, Range("Full"), LineStyle(kDashed),LineColor(kBlue)) ;
 
   //datahist->statOn(frame,Layout(0.55,0.85,0.9)) ;
-  langauss->paramOn(frame, Layout(0.5,0.7,0.85), Format("NEU", AutoPrecision(1)) ) ;
+  langauss->paramOn(frame, Layout(0.5,0.6,0.75), Format("NEU", AutoPrecision(1)) ) ;
   TString parambox = histname;
   parambox += "_paramBox";
   frame->getAttText(parambox)->SetTextColor(kBlack);
