@@ -78,12 +78,12 @@ int main(int argc, char*argv[]){
 
 	PlotFitres(file); 
 	
-	//gROOT->ProcessLine("LycorisLabel(0.48,0.75,\"Preliminary\",1);");
 	//gROOT->ProcessLine("LycorisLabel(0.2,0.85,\"Preliminary\",1);");
-	gROOT->ProcessLine("LycorisLabel(0.55,0.8,\"Preliminary\",1);");
+	gROOT->ProcessLine("LycorisLabel(0.5,0.8,\"\",1);");
 
 	
 	canvas->SaveAs("out.pdf");
+	canvas->SaveAs("out.root");
 	file->Close();
 	delete file;
 	return(1);
@@ -146,7 +146,7 @@ int PlotFitres(TFile *file){
 		std::cerr << "Error: did not find hist object called - "<< rpname << std::endl;
 		return (0);
 	}
-	gROOT->ForceStyle(); 
+	//gROOT->ForceStyle(); 
 	//! Set style for param box
 	TString parambox = rplot->GetTitle();
 	parambox += "_paramBox";
@@ -154,6 +154,15 @@ int PlotFitres(TFile *file){
 	rplot->getAttFill(parambox)->SetFillStyle(0);
 	rplot->getAttLine(parambox)->SetLineWidth(0);
 	rplot->Draw();
+
+	std::vector<TString> text;
+	// text.push_back("#sigma(G) = 0.592 #pm 0.007");
+	// text.push_back("m.p.v(L) = 2.608 #pm 0.006");
+	// text.push_back("#sigma(L) = 0.227 #pm 0.004");
+	text.push_back("#sigma(G) = 0.623 #pm 0.007");
+	text.push_back("m.p.v(L)  = 3.062 #pm 0.006");
+	text.push_back("#sigma(L) = 0.226 #pm 0.004");
+	StatBox(0.45,0.74,1,text);
 
 	return(1);
 }
@@ -204,17 +213,22 @@ void StatBox(Double_t x,Double_t y,Color_t color, std::vector<TString>text )
   TLatex* stat = new TLatex;
   stat->SetNDC();
   stat->SetTextFont(42);
-  stat->SetTextSize(0.04);
+  stat->SetTextSize(0.05);
   stat->SetTextColor(color);
+  stat->SetTextAlign(12);
 
-  TString str="#splitline";
+  //  TString str="#splitline";
+  auto count = 0.0; 
   for (auto && itex : text){
-	  TString tex ="{" + itex + "}";
-	  str+=tex;
+    //	  TString tex ="{" + itex + "}";
+    //	  str+=tex;
+    printf("y-pos at %f : %s\n",y-count, itex.Data());
+    stat->DrawLatex(x,y-count,itex.Data());
+    count+=0.05;
   }
-  printf("%s\n",str.Data());
+
   
-  stat->DrawLatex(x,y,str.Data());
+  //  stat->DrawLatex(x,y,str.Data());
 }
 
 std::vector<TH1F*> FindInHist(TFile *file){
