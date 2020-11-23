@@ -39,8 +39,10 @@ int main(int argc, char*argv[]){
 		filename = TString(argv[1]);
 	}
 	else{
-		TString filedir = "~/Documents/paper/vci2019proc/rooPlots/selfTrig/";
-		filename = filedir + "2018_08_17_16_07_45.bin.root";
+		// TString filedir = "~/Documents/paper/vci2019proc/rooPlots/selfTrig/";
+		// filename = filedir + "2018_08_17_16_07_45.bin.root";
+	  printf("Usage: ./StandardPlotter [rooplot_file_name]");
+	  return(0);
 	}
 	TFile *file = new TFile(filename, "READ");
 	
@@ -78,7 +80,7 @@ int main(int argc, char*argv[]){
 	
 	//gROOT->ProcessLine("LycorisLabel(0.48,0.75,\"Preliminary\",1);");
 	//gROOT->ProcessLine("LycorisLabel(0.2,0.85,\"Preliminary\",1);");
-	gROOT->ProcessLine("LycorisLabel(0.5,0.8,\"Preliminary\",1);");
+	gROOT->ProcessLine("LycorisLabel(0.55,0.8,\"Preliminary\",1);");
 
 	
 	canvas->SaveAs("out.pdf");
