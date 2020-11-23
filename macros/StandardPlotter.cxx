@@ -34,14 +34,14 @@ int main(int argc, char*argv[]){
 		
 	printf("hello world, I have %d args\n", argc);
 	TString filename;
-	if (argc>0){
+	if (argc>1){
 		printf("open file : %s\n", argv[1]);
 		filename = TString(argv[1]);
 	}
 	else{
 		// TString filedir = "~/Documents/paper/vci2019proc/rooPlots/selfTrig/";
 		// filename = filedir + "2018_08_17_16_07_45.bin.root";
-	  printf("Usage: ./StandardPlotter [rooplot_file_name]");
+	  printf("Usage: ./StandardPlotter [rooplot_file_name]\n");
 	  return(0);
 	}
 	TFile *file = new TFile(filename, "READ");
