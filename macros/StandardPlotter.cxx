@@ -160,7 +160,7 @@ int PlotFitres(TFile *file){
 	// text.push_back("m.p.v(L) = 2.608 #pm 0.006");
 	// text.push_back("#sigma(L) = 0.227 #pm 0.004");
 	text.push_back("#sigma(G) = 0.623 #pm 0.007");
-	text.push_back("m.p.v(L)  = 3.062 #pm 0.006");
+	text.push_back("m.p.v(L)  = 3.082 #pm 0.006");
 	text.push_back("#sigma(L) = 0.226 #pm 0.004");
 	StatBox(0.45,0.74,1,text);
 
