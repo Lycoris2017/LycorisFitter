@@ -146,11 +146,11 @@ int PlotFitres(TFile *file){
 		std::cerr << "Error: did not find hist object called - "<< rpname << std::endl;
 		return (0);
 	}
-	//gROOT->ForceStyle(); 
+	gROOT->ForceStyle(); 
 	//! Set style for param box
 	TString parambox = rplot->GetTitle();
 	parambox += "_paramBox";
-	rplot->getAttText(parambox)->SetTextColor(kBlack);
+	rplot->getAttText(parambox)->SetTextColor(kWhite);
 	rplot->getAttFill(parambox)->SetFillStyle(0);
 	rplot->getAttLine(parambox)->SetLineWidth(0);
 	rplot->Draw();
@@ -159,9 +159,9 @@ int PlotFitres(TFile *file){
 	// text.push_back("#sigma(G) = 0.592 #pm 0.007");
 	// text.push_back("m.p.v(L) = 2.608 #pm 0.006");
 	// text.push_back("#sigma(L) = 0.227 #pm 0.004");
-	text.push_back("#sigma(G) = 0.623 #pm 0.007");
-	text.push_back("m.p.v(L)  = 3.082 #pm 0.006");
-	text.push_back("#sigma(L) = 0.226 #pm 0.004");
+	text.push_back("#sigma(G) = 0.517 #pm 0.009");
+	text.push_back("m.p.v.(L) = 2.902 #pm 0.007");
+	text.push_back("#sigma(L) = 0.275 #pm 0.006");
 	StatBox(0.45,0.74,1,text);
 
 	return(1);
